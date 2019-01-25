@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h1>Diamond</h1>
+    <input type="number" value="0" step="1" min="0" id="size" placeholder="size" />
+    <pre id="result"></pre>
+    <script>
+      //заполняет строку заданной длинны (count) однотипными символами (symbol)
+      // fillWith("=", 4) --> ====
+      function fillWith(symbol, count) {
+        let output = "";
+        for (let i = 0; i < count; i++) {
+          output += symbol;
+        }
+        return output;
+      }
+
+      // делает обрамление строки типа ==== или ----- , в виде \/, /\, <> ,
+      // на выходе получаем \====/, /----\, <=====>
+      function addDiamondBorder(size, lineNumber, string) {
+        if (lineNumber == 0 || lineNumber == size * 2) return `${string}`;
+        if (lineNumber < size) return `/${string}\\`;
+        if (lineNumber == size) return `<${string}>`;
+        if (lineNumber > size) return `\\${string}/`;
+      }
+
+      //добавляет заданное количество пробелов по краям
+      function addSpaces(count, string) {
+        let spaces = "";
+        spaces = fillWith(" ", count);
+        return `${spaces}${string}${spaces}`;
+      }
+
+      // добавляет рамку по краям, | | или +  +
+      function addLineBorder(size, lineNumber, string) {
+        let border = "";
+        if (lineNumber == 0 || lineNumber == size * 2) border = "+";
+        else border = "|";
+        return `${border}${string}${border}`;
+      }
+
+      //вычисляет количество пробелов по краям строки бриллианта
+      function getSpacesCount(size, lineNumber) {
+        let spacesCount = 0;
+        if (lineNumber <= size) {
+          spacesCount = size - lineNumber;
+        } else if (lineNumber > size) {
+          spacesCount = lineNumber - size;
+        }
+        if (lineNumber == 0 || lineNumber == size * 2) spacesCount = 0;
+        return spacesCount;
+      }
+
+      //вычисляет количество наполнителя в середине строки бриллианта
+      function getFillingCount(size, lineNumber) {
+        let fillingCount = 0;
+        if (lineNumber <= size) {
+          fillingCount = (lineNumber - 1) * 2; //количество заполняемых символов
+        } else if (lineNumber > size) {
+          fillingCount = (lineNumber - 1) * 2 - (lineNumber - size) * 4; //обратный отсчёт
+        }
+
+        if (fillingCount < 0) fillingCount = size * 2; // случай 0й строки и последней строки
+
+        return fillingCount;
+      }
+
+      // определяет символ заполнения строки - или =
+      function getFillingSymbol(lineNumber) {
+        let symbol = "";
+        if (lineNumber % 2 != 0) symbol = "=";
+        else symbol = "-";
+        return symbol;
+      }
+
+      //формирует 1 линию бриллианта
+      function diamondLine(size, lineNumber) {
+        if (size == 0) return "";
+        let lineText = "";
+        const fillingCount = getFillingCount(size, lineNumber);
+        const spacesCount = getSpacesCount(size, lineNumber);
+
+        let symbol = getFillingSymbol(lineNumber);
+
+        //мы будем пошагово заполнять переменную lineText пока она не превратится в итоговую строку
+        lineText = fillWith(symbol, fillingCount); //заполнили серединку символами, например ====
+        lineText = addDiamondBorder(size, lineNumber, lineText); //добавили границу, например <====>
+        lineText = addSpaces(spacesCount, lineText); //поставили пробелы по краям
+        lineText = addLineBorder(size, lineNumber, lineText); //добавили рамку, например |   /-------\    |
+
+        return lineText;
+      }
+
+      //создает бриллиант заданного размера
+      function createDiamond(size) {
+        const lines = [];
+
+        for (let lineNumber = 0; lineNumber <= size * 2; lineNumber++) {
+          lines.push(diamondLine(size, lineNumber));
+        }
+
+        return lines.join("\n");
+      }
+
+      //когда на странице изменяем размер бриллианта, рисует новый бриллиант и отображает его
+      size.onchange = () => {
+        const size = document.getElementById("size").value;
+        const diamond = createDiamond(size);
+        document.getElementById("result").innerText = diamond;
+      };
+    </script>
+  </body>
+</html>
